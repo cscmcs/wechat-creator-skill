@@ -75,7 +75,7 @@
   </div>
   ```
 
-### 4. 秀米级对比分析卡（Comparison / VS Card）
+### 4. 出版级对比分析卡（Comparison / VS Card）
 - 结构特征：左右或上下双列卡片，红色误区/传统做法 vs 主题色正向解法，视觉冲击极强。
 - Markdown 语法支持：
   ```markdown
