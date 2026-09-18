@@ -94,11 +94,13 @@ description: 微信公众号一站式全能创作专家。集成了事实调研�
   - **安全留白**：重要视觉元素远离四周边距各 40px，防止在特定手机机型信息流中被裁切；
   - 规划符合文章情绪调性的文生图 Prompt。
 
-### 阶段 7：MCP 联动与安全推送到微信草稿箱 (Publishing)
-- **持久化入库**：若已连接 MCP，调用 `save_article`：
-  - 传入 `title`, `content` (Markdown), `theme`, `source="cursor"` 等参数；
-  - 后端自动利用排版引擎渲染内联 HTML 并入库。
-- **草稿箱同步**：调用 `create_wechat_draft`：
+### 阶段 7：MCP 自动直推平台与安全推送到微信草稿箱 (Publishing & Sync)
+- **模板发现**：创作开始前可调用 `get_article_templates`，获取系统精选主题（如松烟 `moyu_green`、手泽 `olive_journal`、金石 `noir_gold`）以及用户在控制台保存的【专属自定义排版模板】。
+- **自动直推网站后台（核心必选）**：若已连接 MCP，推文写完后**必须主动调用 `save_article`**：
+  - 传入 `title`, `content` (Markdown), `theme` (如 `moyu_green`、`tech_blue` 或用户的 `custom_xxx`), `source="agent"`, `summary` 等；
+  - 后端会自动进行高保真 100% 微信内联 CSS 排版并安全存入用户专属数据库；
+  - 向用户反馈：“🎉 文章已同步保存至您的工作台（ID: `#文章ID`），您可以在控制台打开进行可视化二次编辑与秀米级个性化排版微调。”
+- **草稿箱同步**：若用户要求推送到公众号草稿箱，调用 `create_wechat_draft`：
   - **【高危安全红线】本接口严格受限只能创建微信官方草稿箱 (Draft Box)，绝不允许直接对外公开发布**！
   - 提醒用户前往 [微信公众平台 (mp.weixin.qq.com)](https://mp.weixin.qq.com) 进行手机端真机预览与最终发布。
 
