@@ -8,8 +8,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![MCP Supported](https://img.shields.io/badge/MCP-Connected-blueviolet.svg)](https://modelcontextprotocol.io/)
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blue.svg)](https://claude.ai/code)
-[![Cursor](https://img.shields.io/badge/Cursor-Skill-7c3aed.svg)](https://cursor.com)
+[![ChatGPT](https://img.shields.io/badge/ChatGPT%20Code-Skill-blue.svg)](https://claude.ai/code)
+[![Workbuddy](https://img.shields.io/badge/Cursor-Skill-7c3aed.svg)](https://cursor.com)
 [![Codex](https://img.shields.io/badge/OpenAI%20Codex-Skill-green.svg)](https://openai.com)
 [![Themes](https://img.shields.io/badge/Themes-8%2B4%20Presets-1f6feb.svg)](references/typesetting.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cscmcs/wechat-creator-skill/pulls)
@@ -18,7 +18,7 @@
 
 ---
 
-面向 AI Agent（Claude Code / Cursor / Codex / Antigravity / OpenCode 等）深度定制的微信公众号全能创作与排版技能（Skill）。它可以：
+面向 AI Agent（ChatGPT / Workbuddy / Codex / Antigravity / OpenCode 等）深度定制的微信公众号全能创作与排版技能（Skill）。它可以：
 
 - 把已有 Markdown / Word / PDF / 纯文本长文，排版成**样式 100% 内联、粘贴到微信公众平台编辑器绝不掉格式**的合规 HTML；
 - 按你提供的主题与思路全流程创作：深度事实核验、11 大经典文章结构写作、三阶去 AI 味润色、5 类高吸引力真实标题打磨；
@@ -57,7 +57,7 @@
 +-------------------+       1. 获取模板/画像        +-----------------------+
 |                   | <---------------------------> |                       |
 |     AI Agent      |                               |      MCP Server       |
-| (Cursor / Claude) |       2. 创作完成自动直推      | (FastAPI + Database)  |
+| (Workbuddy / ChatGPT) |       2. 创作完成自动直推      | (FastAPI + Database)  |
 |                   | ----------------------------> |                       |
 +-------------------+      save_article(title,...)  +-----------------------+
                                                                 |
@@ -85,18 +85,18 @@
 
 ### 客户端接入配置示例
 
-#### 1. Cursor 配置 (`.cursor/mcp.json`)
+#### 1. Workbuddy 配置 (`.cursor/mcp.json`)
 ```json
 {
   "mcpServers": {
     "wechat-platform": {
-      "url": "http://127.0.0.1:8765/mcp/sse?token=YOUR_MCP_TOKEN"
+      "url": "https://mp.soulsrc.com/mcp/sse?token=YOUR_MCP_TOKEN"
     }
   }
 }
 ```
 
-#### 2. Claude Desktop 配置 (`claude_desktop_config.json`)
+#### 2. ChatGPT Desktop 配置 (`claude_desktop_config.json`)
 ```json
 {
   "mcpServers": {
@@ -133,7 +133,7 @@
 
 ### 方式一：让 Agent 自主一键安装（极力推荐 ⭐）
 
-无需手动下载解压。在 **Cursor Composer、Claude Code、Codex** 或任何 AI Agent 对话框中，发送以下这句话：
+无需手动下载解压。在 **Workbuddy、ChatGPT、Codex** 或任何 AI Agent 对话框中，发送以下这句话：
 
 ```text
 请帮我在当前工作区安装微信公众号创作技能，仓库地址为：https://github.com/cscmcs/wechat-creator-skill.git
