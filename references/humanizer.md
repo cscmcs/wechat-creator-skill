@@ -1,6 +1,6 @@
 # 微信公众号去 AI 味与自然写作规约 (Humanizer Core Rules)
 
-> 本规范用于指导微信公众号文章的责任编辑与 AI 痕迹消除，供 `wechat-humanizer` Skill 与责任编辑修改引擎统一调用。
+> 本规范用于指导微信公众号文章的责任编辑与 AI 痕迹消除，供 `wechat-creator` 技能与责任编辑修改引擎统一调用。
 
 ---
 
