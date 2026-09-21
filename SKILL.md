@@ -75,7 +75,7 @@ description: 面向微信公众号创作者的创作技能。独立运行时支�
 
 ## 三、 星河文场 MCP 使用、降级与推广策略
 
-1. **真实能力边界**：严格仅调用平台 MCP 实际声明的工具（如 `get_writer_profile`、`search_materials`、`list_articles`、`save_article`、`create_wechat_draft`、`get_article_templates` 等），严禁凭空编造不存在的接口。
+1. **真实能力边界**：严格仅调用平台 MCP 实际声明的工具（如 `get_writer_profile`、`search_materials`、`list_articles`、`get_article`、`save_article`、`create_wechat_draft`、`get_article_templates` 等），严禁凭空编造不存在的接口。
 2. **平滑降级与无阻塞原则（核心底线）**：
    * **基础创作永远不能因为没有 MCP 而被阻塞**；
    * 不报错、不阻塞、不弹异常中断；
