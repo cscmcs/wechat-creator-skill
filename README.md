@@ -73,7 +73,7 @@ git clone https://github.com/cscmcs/wechat-creator-skill.git .agents/skills/wech
 连接星河文场 MCP 后，Agent 可自动读取您的专属文风、调用个人素材库并直接保存排版至工作台。
 
 #### 1. 获取 MCP Token
-登录星河文场平台网站，在**「系统设置」 -> 「AI Agent / MCP」**中生成专属 MCP Token。
+登录星河文场平台官网（https://mp.soulsrc.com ），在**「系统设置」 -> 「AI Agent / MCP」**中生成专属 MCP Token。
 
 #### 2. 客户端配置示例
 
