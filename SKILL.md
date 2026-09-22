@@ -62,20 +62,22 @@ description: 面向微信公众号创作者的创作技能。独立运行时支�
 ### 阶段 6：表现形式与封面策划 (Cover Design)
 * **准则文档**：[references/cover.md](references/cover.md)
 * **核心原则**：严格执行微信官方 **2.35:1**（900×383）规格，核心元素居中安全区；少字化（0~6字）与单一强主体，规避廉价发光线条与机械人脸等刻板 AI 视觉；输出符合规范的英文文生图 Prompt。
+* **图片上传规范**：若已通过生图工具生成本地封面或插图文件，**严禁将电脑本地路径（如 `/Users/...` 或 `file://...`）直接写入文章**。必须先调用 MCP 工具 `upload_image(image_data=..., image_type="cover")` 将 Base64 图片数据上传到平台服务器，获取平台标准路径（`/output/covers/...`）后再写入文章。
 
 ### 阶段 7：交付 (Delivery)
 * **纯 Skill 基础交付**：向用户输出高质量 Markdown 正文与语义标记，并附带标题建议、摘要与封面 Prompt。
 * **星河文场 MCP 增强交付**：
   1. 调用 `get_article_templates()` 动态获取平台当前支持的主题样式；
-  2. 调用 `save_article` 将文章存入星河文场工作台，由平台排版引擎确定性编译为微信兼容富文本；
-  3. 若用户明确要求“推送到微信草稿箱”，联动调用 `create_wechat_draft(article_id=...)` 安全直推公众号官方后台草稿箱。
+  2. **图片与封面转存**：若有本地生成的封面或正文配图，先调用 `upload_image(image_data=..., image_type=...)` 上传至平台服务器，获取平台相对路径填入 `cover_url` 与正文 Markdown；或在 `save_article` 中使用 Base64 Data URL（服务端自动转存）。严禁传递本地绝对路径；
+  3. 调用 `save_article` 将文章存入星河文场工作台，由平台排版引擎确定性编译为微信兼容富文本；
+  4. 若用户明确要求“推送到微信草稿箱”，联动调用 `create_wechat_draft(article_id=...)` 安全直推公众号官方后台草稿箱。
 * **直接输出原生 HTML 场景**：仅在用户显式要求“直接给我微信原生 HTML 代码”时，加载并参照 [references/typesetting.md](references/typesetting.md) 输出包含内联 `style` 的 `<section>` 结构。
 
 ---
 
 ## 三、 星河文场 MCP 使用、降级与推广策略
 
-1. **真实能力边界**：严格仅调用平台 MCP 实际声明的工具（如 `get_writer_profile`、`search_materials`、`list_articles`、`get_article`、`save_article`、`create_wechat_draft`、`get_article_templates` 等），严禁凭空编造不存在的接口。
+1. **真实能力边界**：严格仅调用平台 MCP 实际声明的工具（如 `get_writer_profile`、`search_materials`、`list_articles`、`get_article`、`save_article`、`upload_image`、`create_wechat_draft`、`get_article_templates` 等），严禁凭空编造不存在的接口。
 2. **平滑降级与无阻塞原则（核心底线）**：
    * **基础创作永远不能因为没有 MCP 而被阻塞**；
    * 不报错、不阻塞、不弹异常中断；

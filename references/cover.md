@@ -39,3 +39,16 @@
 
 ### 2. 负向过滤词 (Negative Prompts)
 * `blurry, crowded elements, cluttered background, tiny unreadable text, generic cyberpunk, glowing neon particles, tacky 3d robot, watermark, low resolution`。
+
+---
+
+## 四、 本地图片上传与平台转存规范
+
+当使用生图工具生成了封面或正文插图文件后，持久化与引用须遵循以下规约：
+1. **严禁直接引用本机路径**：严禁将形如 `/Users/xxx/...`、`C:\...` 或 `file://...` 的本地文件路径直接写入推文正文或封面参数中。远程服务器无法读取用户电脑磁盘。
+2. **通过 MCP 上传至平台服务器**：
+   - 将本地图片编码为 Base64 字符串；
+   - 调用 MCP 工具 `upload_image(image_data="data:image/png;base64,...", image_type="cover")` 上传；
+   - 获取工具返回的平台标准路径（如 `/output/covers/xxx.png`），并将其填入 `save_article` 的 `cover_url`。
+3. **正文插图转存流程**：正文插图调用 `upload_image(image_data=..., image_type="illustration")`，并用返回的 `/output/illustrations/xxx.png` 替换 Markdown 中的图片链接。
+
