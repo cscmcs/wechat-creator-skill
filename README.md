@@ -54,8 +54,8 @@
 在支持 Agent Skills 的客户端（Antigravity、Cursor 等）对话框中直接发送：
 
 ```text
-请帮我在当前工作区安装微信公众号创作技能，仓库地址为：https://github.com/cscmcs/wechat-creator-skill.git
-请将其 clone 到 .agents/skills/wechat-creator 目录下（若本地未安装 git，请下载 zip 并解压至该目录）。
+请帮我安装全局（用户级别）微信公众号创作技能，以便在所有聊天中都能使用。仓库地址为：https://github.com/cscmcs/wechat-creator-skill.git
+（若本地未安装 git，请下载 zip 并解压）。
 ```
 
 或在终端中手动克隆：
