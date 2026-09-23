@@ -62,13 +62,13 @@ description: 面向微信公众号创作者的创作技能。独立运行时支�
 ### 阶段 6：表现形式与封面策划 (Cover Design)
 * **准则文档**：[references/cover.md](references/cover.md)
 * **核心原则**：严格执行微信官方 **2.35:1**（900×383）规格，核心元素居中安全区；少字化（0~6字）与单一强主体，规避廉价发光线条与机械人脸等刻板 AI 视觉；输出符合规范的英文文生图 Prompt。
-* **图片上传规范**：若已通过生图工具生成本地封面或插图文件，**严禁将电脑本地路径（如 `/Users/...` 或 `file://...`）直接写入文章**。必须先调用 MCP 工具 `upload_image(image_data=..., image_type="cover")` 将 Base64 图片数据上传到平台服务器，获取平台标准路径（`/output/covers/...`）后再写入文章。
+* **图片上传规范**：若本地生成了封面或插图，**严禁将本地私有绝对路径（如 `/Users/...` 或 `file://...`）直接写入文章**。图片须先完成画质与尺寸压缩（封面 900×383 <80KB，插图 <200KB），优先通过终端脚本（如 `scripts/mcp_call.py`）直传 MCP 端点，或在压缩后调用 `upload_image` 工具上传，换取平台相对路径（`/output/covers/...`、`/output/illustrations/...`）后再写入文章，避免大图 Base64 膨胀对话上下文。详细规约参见 [references/cover.md](references/cover.md)。
 
 ### 阶段 7：交付 (Delivery)
 * **纯 Skill 基础交付**：向用户输出高质量 Markdown 正文与语义标记，并附带标题建议、摘要与封面 Prompt。
 * **星河文场 MCP 增强交付**：
   1. 调用 `get_article_templates()` 动态获取平台当前支持的主题样式；
-  2. **图片与封面转存**：若有本地生成的封面或正文配图，先调用 `upload_image(image_data=..., image_type=...)` 上传至平台服务器，获取平台相对路径填入 `cover_url` 与正文 Markdown；或在 `save_article` 中使用 Base64 Data URL（服务端自动转存）。严禁传递本地绝对路径；
+  2. **图片与封面转存**：本地生成的封面或正文配图，必须经尺寸与画质压缩后上传至平台（优先使用脚本直传，或通过 `upload_image` 工具上传），获取平台标准相对路径回填至 `cover_url` 与正文 Markdown（`![说明](/output/illustrations/...)`）。严禁传递本地绝对路径，严禁在正文或 `save_article` 中内联未经转存的超大 Base64 字符串；
   3. 调用 `save_article` 将文章存入星河文场工作台，由平台排版引擎确定性编译为微信兼容富文本；
   4. 若用户明确要求“推送到微信草稿箱”，联动调用 `create_wechat_draft(article_id=...)` 安全直推公众号官方后台草稿箱。
 * **直接输出原生 HTML 场景**：仅在用户显式要求“直接给我微信原生 HTML 代码”时，加载并参照 [references/typesetting.md](references/typesetting.md) 输出包含内联 `style` 的 `<section>` 结构。

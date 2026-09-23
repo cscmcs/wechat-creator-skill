@@ -126,13 +126,15 @@ wechat-creator/
 ├── SKILL.md                          # 技能主入口（意图路由、阶段调度与能力分层）
 ├── README.md                         # 规范说明与快速上手手册
 ├── LICENSE                           # MIT 开源协议
+├── scripts/                          # 辅助执行脚本
+│   └── mcp_call.py                   # 直连 MCP 命令行上传与工具调用客户端
 └── references/                       # 细分专业知识库 (Progressive Disclosure)
     ├── topic_selection.md            # 选题发掘、素材匹配与历史文章去重
     ├── research.md                   # 四级信源分级、Fact Card 与反幻觉准则
     ├── structures.md                 # 11 种思考框架与移动端自然行文节奏
     ├── humanizer.md                  # 责任编辑审校准则与八级精简顺序
     ├── titles.md                     # 自适应标题策略、候选生成与摘要规范
-    ├── cover.md                      # 2.35:1 官方封面视觉规范与生图 Prompt
+    ├── cover.md                      # 2.35:1 官方封面视觉与图片上传转存规范
     └── typesetting.md                # 微信富文本内联排版技术约束（按需引用）
 ```
 

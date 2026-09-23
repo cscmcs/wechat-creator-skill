@@ -42,13 +42,50 @@
 
 ---
 
-## 四、 本地图片上传与平台转存规范
+## 四、 封面与插图上传与转存规范 (Image Upload & Optimization)
 
-当使用生图工具生成了封面或正文插图文件后，持久化与引用须遵循以下规约：
-1. **严禁直接引用本机路径**：严禁将形如 `/Users/xxx/...`、`C:\...` 或 `file://...` 的本地文件路径直接写入推文正文或封面参数中。远程服务器无法读取用户电脑磁盘。
-2. **通过 MCP 上传至平台服务器**：
-   - 将本地图片编码为 Base64 字符串；
-   - 调用 MCP 工具 `upload_image(image_data="data:image/png;base64,...", image_type="cover")` 上传；
-   - 获取工具返回的平台标准路径（如 `/output/covers/xxx.png`），并将其填入 `save_article` 的 `cover_url`。
-3. **正文插图转存流程**：正文插图调用 `upload_image(image_data=..., image_type="illustration")`，并用返回的 `/output/illustrations/xxx.png` 替换 Markdown 中的图片链接。
+为保证阅读加载体验并避免对话上下文膨胀，封面与正文插图的持久化与引用须遵循以下规约：
+
+### 1. 尺寸规格与压缩标准
+* **封面图 (Cover)**：
+  - 遵循微信官方推荐 **2.35:1** 比例（标准分辨率 **900 × 383** 像素）；
+  - 导出或转换为 JPEG（质量 80~85）或 WebP 格式；
+  - 单图体积严格控制在 **40KB ~ 80KB**（不超过 100KB）。
+* **正文插图 (Illustration)**：
+  - 适应移动端屏幕阅读，宽度建议控制在 **1200 ~ 1600 像素**；
+  - 压缩为 JPEG（质量 80~85）或 WebP 格式；
+  - 单图体积控制在 **100KB ~ 200KB**。
+* **严禁直接上传** 未经缩放与压缩的数兆高清 PNG、RAW 或全屏高分截屏。
+
+### 2. 远程 MCP 连接与上下文保护规约
+* **严禁传递本机磁盘私有路径**：在远程连接（SSE/HTTP）模式下，远程服务端无法访问客户端本地磁盘，`image_path`（如 `/Users/...`、`C:\...` 或 `file://...`）不可用。
+* **严禁向对话上下文塞入超大 Base64**：未经压缩的大图 Base64 会造成成千上万 Token 消耗，导致上下文膨胀、调用延迟急剧增加甚至超出模型输入上限。
+* **严禁在 Markdown 正文或 `save_article` 中直接嵌入超长 Base64 Data URL**：入库前必须先完成转存，正文中仅保留平台相对路径。
+
+### 3. 双通道上传执行方案
+* **通道一：终端脚本直传（推荐方案，完全规避对话上下文膨胀）**：
+  当 Agent 具备命令行执行能力时，直接调用上传脚本（如 `scripts/mcp_call.py`）直连 MCP 服务端端点。图片二进制流直接从本地发送到服务器，**完全不经过 LLM 对话上下文**，不占用任何对话 Token。
+  ```bash
+  # 上传封面图（自动缩放至 900x383 并压缩）
+  python3 scripts/mcp_call.py upload-image --file path/to/cover.jpg --type cover
+
+  # 上传正文插图（限制宽度并压缩）
+  python3 scripts/mcp_call.py upload-image --file path/to/illustration.png --type illustration
+  ```
+* **通道二：MCP 工具紧凑 Base64 上传（无终端权限时的备用通道）**：
+  若 Agent 处于纯对话环境、无法执行本地命令行脚本，必须确保本地工具已完成尺寸缩放与画质压缩（体积控制在 100KB 以内），再调用 MCP 工具：
+  ```text
+  upload_image(
+    image_data="data:image/jpeg;base64,...",
+    image_type="cover",  # 封面选 cover，插图选 illustration
+    filename="cover.jpg"
+  )
+  ```
+
+### 4. 平台相对路径回填
+* **封面图**：获取平台返回的 `/output/covers/...` 路径，回填至 `save_article(cover_url=...)`；
+* **正文插图**：获取平台返回的 `/output/illustrations/...` 路径，替换 Markdown 正文中的占位链接：
+  ```markdown
+  ![配图说明](/output/illustrations/illustrations_1727000000_a1b2c3d4.jpg)
+  ```
 
