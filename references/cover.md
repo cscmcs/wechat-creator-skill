@@ -4,88 +4,104 @@
 
 ---
 
-## 一、 官方尺寸与安全视口
+## 一、 官方尺寸与双重视口安全区
 
-微信公众号在会话列表与订阅号常态流中，头条主图遵循官方标准：
+微信公众号在会话列表、常态信息流与转发卡片中具有双重视口特征：
 * **官方推荐比例**：**2.35:1**（标准分辨率：**900 × 383** 像素）；
-* **次条/小图裁剪区**：正中间通常会被特定信息流截取为正方形（1:1），因此**核心视觉主体必须居中**；
-* **四周安全区域**：关键画面元素与文字距离四周边距保留至少 40px 的安全缓冲，避免因手机屏幕圆角或客户端 UI 边缘导致视觉裁切。
+* **中心 1:1 黄金安全区**：横向正中间 **383 × 383** 区域（横坐标区间 `[258px, 642px]`）。主标题与核心视觉锚点必须完整保留在安全区内，保证在订阅号常态流、消息分享卡片或次条裁切为正方形时不被破坏；
+* **四周安全边距**：文字与关键视觉元素距离画面四周至少保留 40px 的缓冲边距。
 
 ---
 
-## 二、 封面视觉设计核心原则
+## 二、 封面视觉设计核心原则与四大排版模板
 
-在手机屏幕上，封面图的实际展示尺寸往往只有几厘米宽，因此必须坚持**强主体、少元素、弱干扰**：
+封面设计坚持**强主体、少元素、图文分层、弱干扰**原则：
 
-1. **拒绝堆砌小字**：
-   * 严禁将文章大纲、副标题、长篇引语塞入封面；
-   * 封面标题文字**非强制项**：可以没有文字，仅靠极具质感的纯视觉主体传递氛围；若有文字，严格控制在 **2~6 个字** 的短词或胶囊标签，字号大、字重大、对比度清晰。
-2. **单一核心视觉锚点**：
-   * 画面必须且仅有**一个清晰的视觉主体**（如：一份工整的实操笔记、一个微光聚焦的键盘、极简的抽象几何体、深夜伏案的真实剪影等）；
-   * 严禁堆砌多个分散杂乱的视觉元素，避免注意力涣散。
-3. **摆脱廉价 AI 视觉刻板印象**：
-   * 坚决规避：无意义的荧光透明发光线条、悬浮全息 HUD 界面、千篇一律的发光机械人脸、满屏蓝色渐变粒子；
-   * 优先追求：出版物级编辑质感、摄影级自然光影、真实纸张或材质纹理、舒适克制的低饱和配色。
+### 1. 四套出版级排版模板
+
+| 模板代码 | 模板名称 | 适用题材 | 视觉规范 |
+| :--- | :--- | :--- | :--- |
+| `editorial` | **现代杂志风** (默认推荐) | 商业分析、深度报道、行业洞察 | 极简留白、分类胶囊标、加粗大标题、精美引线、副标题与底部出品微标 |
+| `bold_quote` | **观点金句风** | 认知突围、职场思辨、金句观点 | 半透明双引号破格水印、居中大字号冲击力标题、暖金/深黑高对比度 |
+| `tech_minimal` | **极客深色风** | AI应用、架构实践、开发实操 | 深空黑曜蓝底色、微光网格、高对比度标签、清晰层级 |
+| `photo_editorial` | **光影纪实风** | 故事纪实、生活方式、人物专访 | **AI 摄影/插画底图** + 自适应暗光渐变蒙层 + 出版级白字悬浮排版 |
+
+### 2. 图文分层原则
+* **背景与主体**：由纯色渐变光晕或 AI 生成的高质感无字底图承载，负责营造氛围；
+* **文本排版层**：由排版引擎精准绘制，支持大标题（40~46px 粗体）、分类胶囊（17~18px 粗体）、副标题（20~22px）与底部出品署名；
+* **文字严禁交由 AI 绘制**：严禁文生图模型直接绘制中文，杜绝乱码与伪英文字符。
 
 ---
 
-## 三、 AI 生图 Prompt 编译策略
+## 三、 AI 生图 Prompt 编译策略 (无字底图)
 
-为文生图模型（如 Midjourney、DALL-E、Imagen 等）生成英文生图 Prompt 时，须保持以下标准：
+为文生图模型（如 FLUX、DALL-E、Imagen 等）生成英文底图 Prompt 时，须遵循以下规约：
 
-### 1. 构图与画幅修饰词
-* **画幅锁定**：在 Prompt 描述中显式声明 `ultra-wide 2.35:1 editorial cover composition, horizontal banner format`；若生图工具支持参数，直接传入 `--ar 2.35:1` 或 `--ar 21:9`（**严禁使用 16:9 以免导致公众号上下裁切变形**）；
+### 1. 强制无字与构图约束
+* **画幅锁定**：显式声明 `ultra-wide 2.35:1 horizontal banner format, panoramic composition`；支持参数的工具传入 `--ar 2.35:1` 或 `--ar 21:9`；
+* **强制无字标记**：必须包含 `no text, no letters, no words, clean background`，防止模型臆造乱码；
 * **质感强化**：`clean composition, authentic textures, natural studio lighting, restrained color palette, ample negative space, modern editorial publication style`。
 
 ### 2. 负向过滤词 (Negative Prompts)
-* `blurry, crowded elements, cluttered background, tiny unreadable text, generic cyberpunk, glowing neon particles, tacky 3d robot, watermark, low resolution`。
+`text, typography, letters, signature, watermark, blurry, crowded elements, cluttered background, generic cyberpunk, glowing neon particles, tacky 3d robot, low resolution`。
 
 ---
 
-## 四、 封面与插图上传与转存规范 (Image Upload & Optimization)
+## 四、 本地与平台生图调用指引
 
-为保证阅读加载体验并避免对话上下文膨胀，封面与正文插图的持久化与引用须遵循以下规约：
+### 1. 终端调用封面生成引擎
+在具备命令行权限时，可直接通过 `core.cover_generator` 快速生成标准 900×383 封面：
+```python
+from core.cover_generator import CoverGenerator
+
+gen = CoverGenerator()
+
+# 1. 现代杂志风
+path1 = gen.generate_cover(
+    title="为什么顶级创作者都在构建专属 AI 工作流？",
+    subtitle="从被动调用到构建专属 Agent 创作引擎的实操反思",
+    tag="深度观察",
+    theme="tech_blue",
+    template="editorial",
+    author="星河文场"
+)
+
+# 2. 观点金句风
+path2 = gen.generate_cover(
+    title="撕掉伪勤奋，用最小可行性逻辑击穿认知障碍",
+    subtitle="认知突围与个人落地指南",
+    tag="认知反思",
+    template="bold_quote",
+    theme="business_dark"
+)
+
+# 3. AI 底图图文复合
+path3 = gen.generate_ai_cover(
+    prompt="A minimal desk with warm lamp light, a clean notebook and fountain pen, cinematic quiet atmosphere",
+    title="知识创作者的写作暗室",
+    subtitle="在信息过载时代保持深度输出的实操体系",
+    tag="特别企划",
+    author="星河文场"
+)
+```
+
+---
+
+## 五、 封面与插图上传与转存规范 (Image Upload & Optimization)
 
 ### 1. 尺寸规格与压缩标准
 * **封面图 (Cover)**：
-  - 遵循微信官方推荐 **2.35:1** 比例（标准分辨率 **900 × 383** 像素）；
-  - 导出或转换为 JPEG（质量 80~85）或 WebP 格式；
-  - 单图体积严格控制在 **40KB ~ 80KB**（不超过 100KB）。
+  - 微信官方推荐 **2.35:1**（标准分辨率 **900 × 383** 像素）；
+  - 格式为 PNG、JPEG（质量 85）或 WebP；
+  - 单图体积控制在 **40KB ~ 100KB**。
 * **正文插图 (Illustration)**：
-  - 适应移动端屏幕阅读，宽度建议控制在 **1200 ~ 1600 像素**；
-  - 压缩为 JPEG（质量 80~85）或 WebP 格式；
+  - 适应移动端屏幕阅读，宽度控制在 **1024 ~ 1600 像素**（推荐 16:9）；
   - 单图体积控制在 **100KB ~ 200KB**。
-* **严禁直接上传** 未经缩放与压缩的数兆高清 PNG、RAW 或全屏高分截屏。
 
-### 2. 远程 MCP 连接与上下文保护规约
-* **严禁传递本机磁盘私有路径**：在远程连接（SSE/HTTP）模式下，远程服务端无法访问客户端本地磁盘，`image_path`（如 `/Users/...`、`C:\...` 或 `file://...`）不可用。
-* **严禁向对话上下文塞入超大 Base64**：未经压缩的大图 Base64 会造成成千上万 Token 消耗，导致上下文膨胀、调用延迟急剧增加甚至超出模型输入上限。
-* **严禁在 Markdown 正文或 `save_article` 中直接嵌入超长 Base64 Data URL**：入库前必须先完成转存，正文中仅保留平台相对路径。
-
-### 3. 双通道上传执行方案
-* **通道一：终端脚本直传（推荐方案，完全规避对话上下文膨胀）**：
-  当 Agent 具备命令行执行能力时，直接调用上传脚本（如 `scripts/mcp_call.py`）直连 MCP 服务端端点。图片二进制流直接从本地发送到服务器，**完全不经过 LLM 对话上下文**，不占用任何对话 Token。
+### 2. 上传与平台相对路径回填
+* **终端脚本直传**：
   ```bash
-  # 上传封面图（自动缩放至 900x383 并压缩）
-  python3 scripts/mcp_call.py upload-image --file path/to/cover.jpg --type cover
-
-  # 上传正文插图（限制宽度并压缩）
-  python3 scripts/mcp_call.py upload-image --file path/to/illustration.png --type illustration
+  python3 scripts/mcp_call.py upload-image --file path/to/cover.png --type cover
   ```
-* **通道二：MCP 工具紧凑 Base64 上传（无终端权限时的备用通道）**：
-  若 Agent 处于纯对话环境、无法执行本地命令行脚本，必须确保本地工具已完成尺寸缩放与画质压缩（体积控制在 100KB 以内），再调用 MCP 工具：
-  ```text
-  upload_image(
-    image_data="data:image/jpeg;base64,...",
-    image_type="cover",  # 封面选 cover，插图选 illustration
-    filename="cover.jpg"
-  )
-  ```
-
-### 4. 平台相对路径回填
-* **封面图**：获取平台返回的 `/output/covers/...` 路径，回填至 `save_article(cover_url=...)`；
-* **正文插图**：获取平台返回的 `/output/illustrations/...` 路径，替换 Markdown 正文中的占位链接：
-  ```markdown
-  ![配图说明](/output/illustrations/illustrations_1727000000_a1b2c3d4.jpg)
-  ```
-
+* **平台相对路径回填**：
+  获取平台返回的 `/output/covers/...` 路径，回填至 `save_article(cover_url=...)`，正文中严禁保留本地绝对路径或超长 Base64。

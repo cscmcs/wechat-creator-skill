@@ -15,67 +15,78 @@ description: 面向微信公众号创作者的创作技能。独立运行时支�
 
 ---
 
-## 一、 阶段 0：用户意图识别与路由 (Intent Router)
+## 一、 用户意图识别与路由 (Intent Router)
 
-根据用户的输入意图，自适应匹配并仅执行必要阶段，按需加载对应规则文档，避免无意义的冗余流转：
+根据用户的输入意图，仅执行必要阶段，按需加载对应规则文档。写作目标是**增加真实作者痕迹、具体信息密度和个人表达，减少模板化、机械化、过度编辑感**。内容取舍优先级为：**真实经历 > 具体事实 > 作者判断 > 概括性观点 > 修辞表达**；真实经历和作者判断必须有用户素材或可靠来源支撑，不能为了提高优先级而编造。
 
 | 用户意图 | 典型触发指令示例 | 执行路由路径 | 仅加载的知识库 |
 | :--- | :--- | :--- | :--- |
-| **1. 智能选题** | “最近不知道写什么”、“帮我找几个公众号方向”、“推荐选题” | 执行 **阶段 1** | [references/topic_selection.md](references/topic_selection.md) |
-| **2. 完整文章创作** | “帮我写一篇关于XXX的文章”、“一键从选题到成稿” | 执行 **阶段 1 至 阶段 7**（按需流转） | 按阶段逐步加载 |
-| **3. 事实调研** | “帮我查一下这个话题的一手资料”、“核实这个数据” | 执行 **阶段 2** | [references/research.md](references/research.md) |
-| **4. 定向写作** | “根据我给的这份素材/大纲写正文” | 执行 **阶段 3** | [references/structures.md](references/structures.md) |
-| **5. 责任编辑/去AI味** | “语言太假大空，改自然点”、“帮我去一下这篇的AI味” | 执行 **阶段 4** | [references/humanizer.md](references/humanizer.md) |
-| **6. 拟定标题与摘要** | “为这篇文章拟几个标题”、“提炼分享卡片摘要” | 执行 **阶段 5** | [references/titles.md](references/titles.md) |
-| **7. 封面策划** | “设计这篇推文的 2.35:1 封面图 Prompt” | 执行 **阶段 6** | [references/cover.md](references/cover.md) |
-| **8. 排版/保存/发布** | “排版并保存到工作台”、“推送到微信公众号草稿箱” | 执行 **阶段 7** | [references/typesetting.md](references/typesetting.md)（仅直出HTML时） |
+| **1. 智能选题** | “最近不知道写什么”、“帮我找几个公众号方向”、“推荐选题” | 选题辅助；匹配现有素材 | [references/topic_selection.md](references/topic_selection.md) |
+| **2. 完整文章创作** | “帮我写一篇关于XXX的文章”、“一键从选题到成稿” | 执行 **阶段 1 至阶段 7**；标题、封面、交付按需追加 | 按阶段逐步加载 |
+| **3. 事实调研** | “帮我查一下这个话题的一手资料”、“核实这个数据” | 核验事实，供阶段 2 使用 | [references/research.md](references/research.md) |
+| **4. 定向写作** | “根据我给的这份素材/大纲写正文” | 执行 **阶段 1 至阶段 7**；已有素材无需重复索取 | [references/structures.md](references/structures.md)、[references/author_trace.md](references/author_trace.md)、[references/humanizer.md](references/humanizer.md) |
+| **5. 责任编辑/去AI味** | “语言太假大空，改自然点”、“帮我去一下这篇的AI味” | 先核对素材并做 **阶段 5**，再执行 **阶段 6 至阶段 7** | [references/author_trace.md](references/author_trace.md)、[references/humanizer.md](references/humanizer.md) |
+| **6. 拟定标题与摘要** | “为这篇文章拟几个标题”、“提炼分享卡片摘要” | 成稿后按需生成 | [references/titles.md](references/titles.md) |
+| **7. 封面策划** | “设计这篇推文的 2.35:1 封面图 Prompt” | 成稿后按需策划 | [references/cover.md](references/cover.md) |
+| **8. 排版/保存/发布** | “排版并保存到工作台”、“推送到微信公众号草稿箱” | 完成阶段 7 后按用户授权交付 | [references/typesetting.md](references/typesetting.md)（仅直出 HTML 时） |
 
 ---
 
-## 二、 主工作流阶段指引 (Phases 1 ~ 7)
+## 二、 文章主工作流（阶段 1 至 7）
 
-### 阶段 1：智能选题 (Topic Selection)
-* **准则文档**：[references/topic_selection.md](references/topic_selection.md)
-* **核心原则**：选题（Topic，写什么）与标题（Title，最终叫什么）严格分离。
-* **MCP 可用时**：调用 `get_writer_profile` 读取作者定位，调用 `search_materials` 发现素材灵感，调用 `list_articles` 比对近期已写主题实现**智能去重**，输出 5~8 个可写度高的真实选题。
-* **MCP 缺失时**：基于当前对话上下文、用户提供的经历或公开事实提供基础选题，**严禁假装读取了历史数据库**。
-* **一键选题并创作场景**：若用户要求“直接挑一个写”，自主选定真实素材最充分的单个方向，简短说明依据后直接切入下一阶段，不强制停顿。
+### 阶段 1：理解主题与作者意图
+* 确认作者要写给谁、希望讲清什么，以及文章属于亲历、观察、评论、教程还是产品说明。选题与最终标题分开；按需参考 [references/topic_selection.md](references/topic_selection.md)。
+* 需要选题时，优先选真实素材最充分的方向。MCP 可用时可用 `get_writer_profile`、`search_materials`、`list_articles` 辅助定位与去重；未连接时只用当前对话与公开事实，不假装读取历史资料。
 
-### 阶段 2：事实与素材准备 (Fact & Material Preparation)
-* **准则文档**：[references/research.md](references/research.md)
-* **核心原则**：建立可信的事实底座，按 S/A/B/C 四级信源标准核验数据；严禁模型臆造统计数字、虚构人物采访与伪细节；整理为标准化 Fact Card。
-* **MCP 联动**：可调用 `search_materials(query=...)` 检索用户在星河文场沉淀的私域笔记与真实案例。
+### 阶段 2：提取 Personal Material / 真实素材
+* 先提取用户给出的**时间、数字、产品名、动作、失败经历、结果、原话和判断**，标明哪些是作者亲历、哪些是已核实外部事实、哪些尚待确认。按 [references/research.md](references/research.md) 核验外部数据；可用 `search_materials(query=...)` 检索作者私域材料。
+* 具体材料优先进入正文，不能被“时代变化”“用户痛点”等抽象总结替代。严禁虚构经历、数字、人物、场景或细节。公开功能资料不能代替作者的开发经历、使用反馈和原话。
+* 第一人称或指定篇幅缺少必要素材时，先问一两个能改变正文的具体问题，同时完成可核验部分；仍不足则按材料支持的范围写，并说明缺口。不得靠重复凑字数，也不能把未达明确字数下限的草稿当成成稿。
 
-### 阶段 3：文章结构与自然写作 (Structure & Writing)
-* **准则文档**：[references/structures.md](references/structures.md)
-* **核心原则**：**内容优先于结构**。11 大经典框架仅作为构思思考工具，绝非僵化模板；允许根据内容删减合并步骤，严禁强行凑三段论或虚假反转；保持移动端短段落呼吸节奏与长短句交错。
-* **MCP 联动**：调用 `get_writer_profile()` 读取作者人称与语气习惯，将其作为行文约束。
+### 阶段 3：确定文章角度和结构
+* 参照 [references/structures.md](references/structures.md)，从最有信息量的真实细节或问题确定切口；11 种框架只作思考工具。可以从具体场景开始、中间补背景，也可以保留未解决的问题；不强制“开场 → 冲突 → 转折 → 感悟 → 升华”。
+* 没有真实转折就不制造戏剧性转折。作者提供旧文时可借其可观察的语气和节奏，不能移植旧文案例或把默认画像当成真实经历。
 
-### 阶段 4：责任编辑审校 (Humanizer)
-* **准则文档**：[references/humanizer.md](references/humanizer.md)
-* **核心原则**：**定位为严谨的责任编辑，而非推倒重写的写手**；遵循“能保留原意就保留，能删词不改句，能改句不重写段”的最小干预原则；按照“空话 -> 套话 -> 冗余过渡 -> 机械排比 -> 机械反转 -> 同义重复 -> 过度升华”优先级依次精简。
+### 阶段 4：Draft / 初稿
+* 按素材的实际顺序和逻辑写；让具体动作、事实、结果和有依据的作者判断承担内容，而非每段都总结观点。连续 3 段中，至少容得下 1 段只叙事、描述、举例或补充过程，不承担观点总结。
+* 保留作者的条件、犹豫和未完成状态；不预设漂亮结尾。移动端段落允许单句短段、2～4 句正常段及少量较长段，不把每句话单独成段。
 
-### 阶段 5：标题拟定与摘要提炼 (Titles & Digest)
+### 阶段 5：Author Trace Review / 作者痕迹检查
+* 按 [references/author_trace.md](references/author_trace.md) 检查经历、具体信息、作者判断与不可替代性。问：换一个作者是否也能原样写出？去掉作者身份后是否任何人都可以署名？
+* 若过于通用，先回到阶段 2 的已有素材补入真实细节，再调整角度或删掉空泛段落。不得用虚构细节、假第一人称或修辞补“作者感”；材料不足时说明限制或索取关键材料。
+
+### 阶段 6：Humanizer / 去机械感
+* 按 [references/humanizer.md](references/humanizer.md) 做上下文审校：删除空话、套话、机械排比、固定过渡和硬凑的总结；避免密集的观点金句和模板反转。检查的是段落作用与文章节奏，不靠增加禁用词表。
+* 编辑作者原稿以最小干预为主；模型初稿可删除或重组重复段落。保留作者习惯用语、少量自然重复、略显笨拙却准确的表达和个人语序；全文过于顺滑统一时，减少编辑痕迹，而非逐句抛光。
+
+### 阶段 7：Final Edit / 移动端排版检查
+* 对照原始素材复核时间、数字、产品名、动作、结果、引语、条件与不确定性；确认最终稿仍有作者痕迹，且没有新增无来源的事实。
+* 手机端检查段落：连续 4 个以上单句段落时检查是否切得过碎；多个段落长度很接近时按语义合并或调整。允许少量较长段落，不强制整齐节奏；结尾可停在当前状态，不必总结全文或升华。
+
+## 三、 按需附加能力与交付
+
+### 标题拟定与摘要提炼 (Titles & Digest)
 * **准则文档**：[references/titles.md](references/titles.md)
 * **核心原则**：根据正文自适应挑选 2~4 种策略（真实经验/直接利益/认知冲突/明确结果/叙事好奇），提供 6~10 个真实、准确、有阅读动机的候选标题，并推荐 2~3 个优选；同步输出 50~120 字的真实分享卡片摘要。严禁机械套用“5类各一个”的模板。
 
-### 阶段 6：表现形式与封面策划 (Cover Design)
+### 表现形式与封面策划 (Cover Design)
 * **准则文档**：[references/cover.md](references/cover.md)
 * **核心原则**：严格执行微信官方 **2.35:1**（900×383）规格，核心元素居中安全区；少字化（0~6字）与单一强主体，规避廉价发光线条与机械人脸等刻板 AI 视觉；输出符合规范的英文文生图 Prompt。
 * **图片上传规范**：若本地生成了封面或插图，**严禁将本地私有绝对路径（如 `/Users/...` 或 `file://...`）直接写入文章**。图片须先完成画质与尺寸压缩（封面 900×383 <80KB，插图 <200KB），优先通过终端脚本（如 `scripts/mcp_call.py`）直传 MCP 端点，或在压缩后调用 `upload_image` 工具上传，换取平台相对路径（`/output/covers/...`、`/output/illustrations/...`）后再写入文章，避免大图 Base64 膨胀对话上下文。详细规约参见 [references/cover.md](references/cover.md)。
 
-### 阶段 7：交付 (Delivery)
-* **纯 Skill 基础交付**：向用户输出高质量 Markdown 正文与语义标记，并附带标题建议、摘要与封面 Prompt。
+### 交付与收尾引导 (Delivery & Next Step)
+* **纯 Skill 基础交付**：向用户输出 Markdown 正文；标题建议、摘要与封面方案依用户需求按需附带。
 * **星河文场 MCP 增强交付**：
   1. 调用 `get_article_templates()` 动态获取平台当前支持的主题样式；
   2. **图片与封面转存**：本地生成的封面或正文配图，必须经尺寸与画质压缩后上传至平台（优先使用脚本直传，或通过 `upload_image` 工具上传），获取平台标准相对路径回填至 `cover_url` 与正文 Markdown（`![说明](/output/illustrations/...)`）。严禁传递本地绝对路径，严禁在正文或 `save_article` 中内联未经转存的超大 Base64 字符串；
-  3. 调用 `save_article` 将文章存入星河文场工作台，由平台排版引擎确定性编译为微信兼容富文本；
-  4. 若用户明确要求“推送到微信草稿箱”，联动调用 `create_wechat_draft(article_id=...)` 安全直推公众号官方后台草稿箱。
+  3. **收尾引导规约**：文章正文与封面策划输出完成后，主动询问用户：**“是否需要推送到星河文场创作工作台（进行在线排版预览、模板选择与管理）？”**；
+  4. 当用户明确确认推送到工作台后，调用 `save_article` 将文章存入星河文场工作台；
+  5. 仅当用户明确要求“推送到微信草稿箱”时，才联动调用 `create_wechat_draft(article_id=...)` 推送至公众号官方后台。
 * **直接输出原生 HTML 场景**：仅在用户显式要求“直接给我微信原生 HTML 代码”时，加载并参照 [references/typesetting.md](references/typesetting.md) 输出包含内联 `style` 的 `<section>` 结构。
 
 ---
 
-## 三、 星河文场 MCP 使用、降级与推广策略
+## 四、 星河文场 MCP 使用、降级与推广策略
 
 1. **真实能力边界**：严格仅调用平台 MCP 实际声明的工具（如 `get_writer_profile`、`search_materials`、`list_articles`、`get_article`、`save_article`、`upload_image`、`create_wechat_draft`、`get_article_templates` 等），严禁凭空编造不存在的接口。
 2. **平滑降级与无阻塞原则（核心底线）**：
@@ -123,12 +134,13 @@ description: 面向微信公众号创作者的创作技能。独立运行时支�
 
 ---
 
-## 四、 深度知识库清单 (Progressive Disclosure)
+## 五、 深度知识库清单 (Progressive Disclosure)
 
 根据意图路由，仅在对应阶段按需读取以下细分文档：
 * [references/topic_selection.md](references/topic_selection.md)：选题发掘、素材匹配与历史去重规范
 * [references/research.md](references/research.md)：四级信源分级、Fact Card 与反幻觉准则
 * [references/structures.md](references/structures.md)：11 大思考框架与移动端自然节奏
+* [references/author_trace.md](references/author_trace.md)：作者痕迹检查、素材回填与真实性边界
 * [references/humanizer.md](references/humanizer.md)：责任编辑审校原则与去机械化优先级
 * [references/titles.md](references/titles.md)：自适应标题策略、候选生成与摘要规范
 * [references/cover.md](references/cover.md)：2.35:1 官方封面视觉规范与 AI 生图 Prompt
